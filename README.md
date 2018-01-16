@@ -27,34 +27,47 @@ Interacting with FREQL simply requires implementing the "FreqlApp" interface in 
 Think about your data in graph terms.  For FakeYouToob, we might have User nodes with outgoing edges to watched Videos or my Subscribers:
 
 object User extends Obj()
+
 object Video extends Obj()
 
 object Watched extends Edge()
+
 object Subscribed extends Edge()
 
+
 val WatchedVideo = Relation(User, Watched, Video)
+
 val SubscribedToUser = Relation(User, Subscribed, User)
 
 ### Step 2: Defining your Queries
 Now we could do a boring graph query to get all of User 1's watched videos:
 
 Select(Video,
+
 From(WatchedVideo)
+
 Where InputEquals( Id("1") ) )
 
 Or something more interesting like finding users similar to me based on what I've seen *and* who I subscribe to (multimodal FTW):
 
 val similarUsers =
+
 Select(User,
+
 From(WatchedVideo) Join SubscribedToUser
+
 Where Not InputEqualsOutput ) //(Exclude myself)
 
 This query will ultimately be passed a User Id to get other users most similar to him/her.  Now we can traverse similarUsers "To" their watched videos as Autoplay recommendations:
 
 val autoplaySuggestions =
+
 Select(Video,
+
 From(similarUsers) To WatchedVideos
+
 Where Not InputRelatedBy( WatchedVideo )  //Filter out what I've already seen
+
 
 Functional composition FTW!  Now you can call autoplaySuggestions( Id("1") ) to suggest videos for User 1.
 
