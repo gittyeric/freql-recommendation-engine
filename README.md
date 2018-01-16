@@ -20,7 +20,7 @@ Luckily the only hard dependency is Apache Ignite.  You can read Ignite's Gettin
 
 ## How to use
 
-Interacting with FREQL simply requires implementing the "FreqlApp" interface in Scala or Java.  The examples folder has a reference "FakeYouToobApp" that will be used for demonstration here.  You simply define the InputStreams (typically from Kafka), OutputStreams (typically over HTTP to some persistent API), and the queries you'd like answered between them.  Writing your App in Scala allows you to write in a type-safe DSL that's familiar to SQL users.
+Interacting with FREQL simply requires implementing the "FreqlApp" interface in Scala or Java.  The examples folder has a reference "FakeYouToobApp" that will be used for demonstration here.  You simply define the EventStreams (typically from Kafka), OutputStreams (typically over HTTP to some persistent API), and the queries you'd like answered between them.  Writing your App in Scala allows you to write in a type-safe DSL that's familiar to SQL users.
 
 ### Step 1: Define your Node types and Relations
 
@@ -58,17 +58,17 @@ Where Not InputRelatedBy( WatchedVideo )  //Filter out what I've already seen
 
 Functional composition FTW!  Now you can call autoplaySuggestions( Id("1") ) to suggest videos for User 1.
 
-### Step 3: Define your Input and Output Streams
+### Step 3: Define your Event and Output Streams
 
 Kafka makes for a great replay-able and scalable stream of events, so a KafkaEventStream is provided by default though you can easily create your own EventStream.  You can choose to trigger output either by explicit request, or by a reaction to recommendations changing in realtime.  For either purpose you'll want to use a TriggeredQuery or ReactiveQuery respectively, both of which have a simple HTTP implementations.
 
 ## Building / Running
 
-Use mvn's compile goal to build:
+Use Maven's compile goal to build from command line:
 
 mvn compile
 
-Then use mvn's exec goal to run (change Main class to your FreqlApp class):
+Then use Maven's exec goal to run (change Main class to your FreqlApp class):
 
 mvn exec:java -D"exec.mainClass"="com.lmi.examples.whitepaper.Main"
 
