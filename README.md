@@ -6,15 +6,15 @@ FREQL is a realtime, highly scalable recommendation engine with a SQL-like query
 
 ## Contents
 
-[Why FREQL?](doc/why-freql-over-a-spark-based-library?)
+[Why FREQL?](#why-freql-over-a-spark-based-library)
+
+[Writing your Recommender App](#writing-your-app)
 
 [Requirements](doc/requirements.md)
 
-[Writing your App](writing-your-app)
-
 [Building and Running](doc/build_and_run.md)
 
-## Why FREQL over a Spark-based Library?
+## Why FREQL over a Spark based Library?
 
 This library is directly based on a state-of-the-art Apache Spark [Mahout library](https://mahout.apache.org/docs/latest/algorithms/reccomenders/) but improves on it in a number of ways:
 
@@ -31,7 +31,7 @@ The examples folder has a reference "FakeYouToobApp" that will be used for demon
 and is a great starting point to see how a custom "FreqlApp" works.
 You simply define the input EventStreams (typically from Kafka), OutputStreams
 (typically over HTTP to some persistent API), and the queries you'd like answered between them.
-Writing your FreqlApp in Scala allows you to write in a type-safe DSL that's familiar to SQL users.
+Writing your FreqlApp in Scala allows you to write in a type-safe DSL that's similar to SQL.
 
 ### Step 1: Define your Node types and Relations
 
@@ -86,7 +86,11 @@ This query will ultimately be passed a User Id to get other users most similar t
     Where Not InputRelatedBy( WatchedVideo )  //Filter out what I've already seen
 
 
-Functional composition FTW!  Now you can call autoplaySuggestions( Id("1") ) to suggest videos for User 1.
+Functional composition FTW!  Now you can call
+
+    autoplaySuggestions( Id("1") )
+
+to suggest videos for User 1.
 
 ### Step 3: Define your input EventStreams and OutputStreams
 
