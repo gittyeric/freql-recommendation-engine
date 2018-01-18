@@ -4,6 +4,16 @@
 
 FREQL is a realtime, highly scalable recommendation engine with a SQL-like query language.  It can be used both as a huge in-memory distributed graph database and as a "multimodal", "collaborative filtering" rec engine.
 
+## Contents
+
+[Why FREQL?](doc/why-freql-over-a-spark-based-library?)
+
+[Requirements](doc/requirements.md)
+
+[Writing your App](writing-your-app)
+
+[Building and Running](doc/build_and_run.md)
+
 ## Why FREQL over a Spark-based Library?
 
 This library is directly based on a state-of-the-art Apache Spark [Mahout library](https://mahout.apache.org/docs/latest/algorithms/reccomenders/) but improves on it in a number of ways:
@@ -14,14 +24,7 @@ This library is directly based on a state-of-the-art Apache Spark [Mahout librar
 4. Extremely multimodal, mix many dimensions of a user's data to get better and better results.
 5. A flexible, dummy-proof query lanuage that mixes graph queries with recommendation scores!
 
-## Setup
-
-The only hard dependencies are Java 8 or above and Maven 3 or above.  You can read Ignite's [Cluster Configuration](https://apacheignite.readme.io/docs/cluster-config) documentation to see how to set up a production cluster, otherwise you can use the default configuration of a local cluster on a single machine. With this installed, download or clone the codebase:
-
-    git clone https://github.com/gittyeric/freql-recommendation-engine.git
-
-
-## How to use
+## Writing your App
 
 Interacting with FREQL simply requires implementing the "FreqlApp" interface in Scala or Java.
 The examples folder has a reference "FakeYouToobApp" that will be used for demonstration here
@@ -93,19 +96,6 @@ An "Event" is simply an occurrence of some node Id with an edge pointing to some
 You can choose to trigger output either by explicit request, or by a reaction to
 recommendations changing in realtime.  For either purpose you'll want to use a
 TriggeredQuery or ReactiveQuery respectively, both of which have simple HTTP implementations.
-
-## Building
-
-Use Maven's compile goal to build from command line:
-
-    cd /path/to/freql-recommendation-engine
-    mvn compile
-
-## Running
-
-Then use Maven's exec goal to run (change Main class to your FreqlApp class):
-
-    mvn exec:java -D"exec.mainClass"="com.lmi.examples.fakeyoutoob.Main"
 
 ### TODO
 
