@@ -35,7 +35,7 @@ Writing your FreqlApp in Scala allows you to write in a type-safe DSL that's fam
 Think about your data in graph terms.  For FakeYouToob, we might have User nodes with outgoing edges to watched Videos or my Subscribers:
 
 #####
-![YouToob example graph](ut_graph.png)
+![YouToob example graph](doc/ut_graph.png)
 #####
 
 
