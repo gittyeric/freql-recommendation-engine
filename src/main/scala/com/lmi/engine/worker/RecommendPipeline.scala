@@ -25,12 +25,13 @@ class RecommendPipeline
 (implicit context: PipelineContext)
 	extends TopScoreSource[ORIGIN, E, ORIGIN, DEST] {
 	
+	implicit private val ignite = context.ignite
+	private val history = new HistoryService(relation)
+	
 	//Self managed Sub-services, exposed for FREQL convenience
 	val items: HistorySource[ORIGIN, E, DEST] = history
 	val originType = relation.origin
 	val destType = relation.destination
-	implicit private val ignite = context.ignite
-	private val history = new HistoryService(relation)
 	private val coocurrences = new CoocurService(relation)
 	private val similarities = new SimilarityService(relation)
 	private val originLRU =

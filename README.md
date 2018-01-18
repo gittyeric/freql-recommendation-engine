@@ -94,12 +94,14 @@ You can choose to trigger output either by explicit request, or by a reaction to
 recommendations changing in realtime.  For either purpose you'll want to use a
 TriggeredQuery or ReactiveQuery respectively, both of which have simple HTTP implementations.
 
-## Building / Running
+## Building
 
 Use Maven's compile goal to build from command line:
 
     cd /path/to/freql-recommendation-engine
     mvn compile
+
+## Running
 
 Then use Maven's exec goal to run (change Main class to your FreqlApp class):
 
