@@ -5,6 +5,7 @@ MAINTAINER  Eric <git@letsmakeit.com>
 
 ARG REPO_URL="https://github.com/gittyeric/freql-recommendation-engine.git"
 ARG FREQL_JVM_RAM="256M"
+ARG MAIN_CLASS
 
 ### Create new Docker image
 
@@ -29,3 +30,5 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN cd /opt && git clone $REPO_URL
 RUN cd /opt/freql-recommendation-engine && mvn compile
+
+CMD mvn exec:java -D"exec.mainClass"="${MAIN_CLASS}"

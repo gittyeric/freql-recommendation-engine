@@ -1,20 +1,24 @@
 package com.lmi.engine
 
-import com.lmi.engine.graph.Node
+import com.lmi.engine.graph.{Edge, Node}
+import com.lmi.engine.worker.RelationService
 import com.lmi.engine.worker.event.EventRouter
 import com.lmi.engine.worker.input.EventStream
 import com.lmi.engine.worker.output.trigger.TriggeredQuery
-import com.lmi.engine.worker.{PipelineContext, RecommendPipeline}
+import com.lmi.engine.worker.output.trigger.protocols.TriggerProtocol
 
 trait FreqlApp extends Serializable {
 	
 	def name: String
 	
 	//Define how to map input events to Historic Relations
-	def eventSources: EventSources
+	def inputEvents: EventInputs
 	
-	//Define computation pipelines to their outputs
-	def buildComputationGraph()(implicit context: PipelineContext): ComputationGraph
+	//Map queries to outputs
+	def outputs: Outputs
+	
+	//Define computation pipelines
+	def pipelines(): Seq[RelationService[_ <: Node, _ <: Edge, _ <: Node]]
 	
 	//Defines max number of most recent (LRU) nodes of a type will be stored for any relations
 	//No LRU eviction will occur for Long.MaxValue
@@ -22,12 +26,10 @@ trait FreqlApp extends Serializable {
 	
 }
 
-final case class EventSources(
+final case class EventInputs(
 	                             inputs: Seq[EventStream],
 	                             router: EventRouter
-                             )
+                            ) extends Serializable
 
-final case class ComputationGraph(
-	                                 pipelines: Seq[RecommendPipeline[_, _, _]],
-	                                 triggeredOutputs: Seq[TriggeredQuery[_, _, _]] = Seq()
-                                 )
+final case class Outputs(triggeredOutputs: Seq[TriggeredQuery[_ <: Node, _ <: Node, _ <: TriggerProtocol]] = Seq())
+	extends Serializable

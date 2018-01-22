@@ -10,21 +10,19 @@ class IgnitableTest {
 	
 	//Clear all Ignite state after each test
 	@After
+	//@Before
 	def after(): Unit = {
 		val names = ignite.cacheNames()
 		ignite.destroyCaches(names)
-		
-		/*names.forEach(new Consumer[String] {
-			override def accept(name: String): Unit = {
-				ignite.cache(name).removeAll()
-			}
-		})*/
 	}
 	
 	object IgnitableTests {
 		@AfterClass
 		def teardown(): Unit = {
+			val names = ignite.cacheNames()
+			ignite.destroyCaches(names)
 			ignite.close()
+			
 		}
 	}
 	

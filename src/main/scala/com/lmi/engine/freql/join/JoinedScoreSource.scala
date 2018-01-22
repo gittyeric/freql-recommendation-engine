@@ -11,9 +11,9 @@ class JoinedScoreSource
  reduceScoreKeysOp: JoinByKeyOp)
 	extends TopScoreSource[IN, MergedEdge[T, T2], TObj, MergedNode[GIVEN, GIVEN2]] {
 	
-	override def getRecommendations(originId: Id[IN], maxCount: Int): TopScores[IN, TObj] = {
-		val output1 = source1.getRecommendations(originId, maxCount)
-		val output2 = source2.getRecommendations(originId, maxCount)
+	override def similarTo(originId: Id[IN], maxCount: Int): TopScores[IN, TObj] = {
+		val output1 = source1.similarTo(originId, maxCount)
+		val output2 = source2.similarTo(originId, maxCount)
 		
 		FreqlUtils.normalize(reduceScoreKeysOp.join(output1, output2))
 	}

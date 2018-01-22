@@ -1,7 +1,7 @@
 package com.lmi.engine.worker.pipeline
 
 import com.lmi.engine.graph.{Id, Node}
-import com.lmi.engine.worker.{PipelineContext, RecommendPipeline}
+import com.lmi.engine.worker.{PipelineContext, RelationService}
 import com.lmi.engine.{EngineTuning, TestTuning}
 import com.lmi.util.IgnitableTest
 import helpers.FakeGraph._
@@ -10,11 +10,17 @@ import org.junit.Test
 
 import scala.collection.mutable
 
-class PipelineTest extends IgnitableTest {
+object PipelineConstants {
 	
 	//Note: Sorry! These are sloowww tests due to eventual consistency
 	//If you're sure your hardware is fast, change this constant temporarily
 	val PIPELINE_PROCESSING_DELAY = 750
+	
+}
+
+class RelationServiceTest extends IgnitableTest {
+	
+	import PipelineConstants._
 	
 	val superIgnite = ignite
 	
@@ -40,11 +46,13 @@ class PipelineTest extends IgnitableTest {
 	
 	@Test
 	def fillPipeCachedRecs(): Unit = {
-		val pipeline = new RecommendPipeline(FooToBar)(noLRUContext)
+		implicit val context = noLRUContext
+		val pipeline = new RelationService(FooToBar)
 		fillPipe(pipeline)
 	}
 	
-	private def fillPipe(pipeline: RecommendPipeline[Foo.type, ToEdge.type, Bar.type]): Unit = {
+	private def fillPipe
+	(pipeline: RelationService[Foo.type, ToEdge.type, Bar.type])(implicit context: PipelineContext): Unit = {
 		pipeline.start()
 		
 		val originCount = 10
@@ -56,7 +64,7 @@ class PipelineTest extends IgnitableTest {
 		
 		(1 to originCount).foreach(i => {
 			val seen: mutable.Set[String] = mutable.HashSet()
-			val recs = pipeline.getRecommendations(Id(i.toString), originCount - 1).scores
+			val recs = pipeline.similarTo(Id(i.toString), originCount - 1).scores
 			recs.foreach(rec => {
 				seen += rec.similarTargetId.id
 			})
@@ -67,23 +75,28 @@ class PipelineTest extends IgnitableTest {
 	
 	@Test
 	def fillPipeNoCachedRecs(): Unit = {
-		val pipeline = new RecommendPipeline(FooToBar, maxCachedRecs = 0)(noLRUContext)
+		implicit val context = noLRUContext
+		val pipeline = new RelationService(FooToBar, maxCachedRecs = 0)
 		fillPipe(pipeline)
 	}
 	
 	@Test
 	def fillToEvictionCachedRecs(): Unit = {
-		val pipeline = new RecommendPipeline(FooToBar)(dualFooContext)
+		implicit val context = dualFooContext
+		val pipeline = new RelationService(FooToBar)
 		fillToEviction(pipeline)
 	}
 	
 	@Test
 	def fillToEvictionNoCachedRecs(): Unit = {
-		val pipeline = new RecommendPipeline(FooToBar, maxCachedRecs = 0)(dualFooContext)
+		implicit val context = dualFooContext
+		val pipeline = new RelationService(FooToBar, maxCachedRecs = 0)
 		fillToEviction(pipeline)
 	}
 	
-	private def fillToEviction(pipeline: RecommendPipeline[Foo.type, ToEdge.type, Bar.type]) = {
+	private def fillToEviction
+	(pipeline: RelationService[Foo.type, ToEdge.type, Bar.type])
+	(implicit context: PipelineContext) = {
 		pipeline.start()
 		
 		(3 to 10).foreach(i => {
@@ -101,8 +114,8 @@ class PipelineTest extends IgnitableTest {
 		pipeline.items.putHistoryAsync(idFoo2, idBar).get()
 		Thread.sleep(PIPELINE_PROCESSING_DELAY)
 		
-		val idFoo1Recs = pipeline.getRecommendations(idFoo, 50)
-		val idFoo2Recs = pipeline.getRecommendations(idFoo2, 50)
+		val idFoo1Recs = pipeline.similarTo(idFoo, 50)
+		val idFoo2Recs = pipeline.similarTo(idFoo2, 50)
 		
 		assert(idFoo1Recs.scores(0).similarTargetId
 			.equals(idFoo2), "Wrong recommendation?")

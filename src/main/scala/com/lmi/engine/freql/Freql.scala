@@ -7,28 +7,28 @@ import com.lmi.engine.freql.pivot.{SourcesPivoter, WeightedPipeOp}
 import com.lmi.engine.freql.score.{HistoryUnitSource, TopScoreSource, TopScores}
 import com.lmi.engine.freql.traverse.{DestinationSumOp, SourceTraverser, TraverseOp}
 import com.lmi.engine.graph._
-import com.lmi.engine.worker.history.HistorySource
+import com.lmi.engine.worker.history.HistoricProvider
 
-class FreqlFrom[INPUT <: Node, E <: Edge, TObj <: Node, GIVEN_ITEM <: Node]
-(val source: TopScoreSource[INPUT, E, TObj, GIVEN_ITEM]) {
+class FreqlFrom[INPUT <: Node, E <: Edge, OUTPUT <: Node, GIVEN_ITEM <: Node]
+(val source: TopScoreSource[INPUT, E, OUTPUT, GIVEN_ITEM]) {
 	
 	def `+`[R2 <: Edge, GIVEN2 <: Node]
-	(rFrom: FreqlFrom[INPUT, R2, TObj, GIVEN2]) = Join(rFrom)
+	(rFrom: FreqlFrom[INPUT, R2, OUTPUT, GIVEN2]) = Join(rFrom)
 	
 	def Join[R2 <: Edge, GIVEN_ITEM2 <: Node](
-		                                         rightSource: FreqlFrom[INPUT, R2, TObj, GIVEN_ITEM2],
+		                                         rightSource: FreqlFrom[INPUT, R2, OUTPUT, GIVEN_ITEM2],
 		                                         by: JoinByKeyOp = JoinByMaxOp()):
-	FreqlFrom[INPUT, MergedEdge[E, R2], TObj, MergedNode[GIVEN_ITEM, GIVEN_ITEM2]] = {
+	FreqlFrom[INPUT, MergedEdge[E, R2], OUTPUT, MergedNode[GIVEN_ITEM, GIVEN_ITEM2]] = {
 		new FreqlFrom(new JoinedScoreSource(source, rightSource.source, by))
 	}
 	
 	def `-->`[NEW_E <: Edge, NEWOUT <: Node]
-	(historySource: HistorySource[TObj, NEW_E, NEWOUT]) = To(historySource)
+	(historySource: HistoricProvider[OUTPUT, NEW_E, NEWOUT]) = To(historySource)
 	
 	//follows a relationship from origins to their destinations,
 	//with destinations inheriting the (weighted sum of) scores from their origins' scores
 	def To[NEW_E <: Edge, NEWOUT <: Node]
-	(historySource: HistorySource[TObj, NEW_E, NEWOUT],
+	(historySource: HistoricProvider[OUTPUT, NEW_E, NEWOUT],
 	 destinationScorer: TraverseOp[NEWOUT] = DestinationSumOp[NEWOUT](),
 	 RelationLimit: Int = Int.MaxValue)
 	: FreqlFrom[INPUT, NEW_E, NEWOUT, GIVEN_ITEM] = {
@@ -37,11 +37,11 @@ class FreqlFrom[INPUT <: Node, E <: Edge, TObj <: Node, GIVEN_ITEM <: Node]
 	}
 	
 	def `-O->`[NEWOUT <: Node, GIVEN2 <: Node, E2 <: Edge]
-	(pivotTo: FreqlFrom[TObj, E2, NEWOUT, GIVEN2]) = Pivot(pivotTo)
+	(pivotTo: FreqlFrom[OUTPUT, E2, NEWOUT, GIVEN2]) = Pivot(pivotTo)
 	
 	//Take some TopScores for origins and find other similar origins given a GIVEN2 destination.
 	def Pivot[NEWOUT <: Node, GIVEN2 <: Node, E2 <: Edge]
-	(pivotTo: FreqlFrom[TObj, E2, NEWOUT, GIVEN2],
+	(pivotTo: FreqlFrom[OUTPUT, E2, NEWOUT, GIVEN2],
 	 maxSimsPerTarget: Int = Int.MaxValue)
 	: FreqlFrom[INPUT, MergedEdge[E, E2], NEWOUT, MergedNode[GIVEN_ITEM, GIVEN2]] = {
 		new FreqlFrom(new SourcesPivoter(source, pivotTo.source, new WeightedPipeOp[NEWOUT], maxSimsPerTarget))
@@ -50,13 +50,17 @@ class FreqlFrom[INPUT <: Node, E <: Edge, TObj <: Node, GIVEN_ITEM <: Node]
 	def Randomize(
 		             fairness: Double = 1.0,
 		             maxDemotions: Int = Int.MaxValue,
-		             seed: Long = 87): FreqlFrom[INPUT, E, TObj, GIVEN_ITEM] = {
+		             seed: Long = 87): FreqlFrom[INPUT, E, OUTPUT, GIVEN_ITEM] = {
 		
 		new FreqlFrom(new SourceMapper(source, new DitherOp(fairness, maxDemotions, seed)))
 	}
 	
-	def Where(filter: FilterOp): FreqlFrom[INPUT, E, TObj, GIVEN_ITEM] = {
+	def Where(filter: FilterOp): FreqlFrom[INPUT, E, OUTPUT, GIVEN_ITEM] = {
 		new FreqlFrom(new SourceMapper(source, filter))
+	}
+	
+	def find(similarTo: Id[INPUT], maxCount: Int): TopScores[INPUT, OUTPUT] = {
+		source.similarTo(similarTo, maxCount)
 	}
 	
 }
@@ -80,7 +84,7 @@ trait FreqlSelect[INPUT <: Node, E <: Edge, OUTPUT <: Node, GIVEN <: Node] {
 	def from: FreqlFrom[INPUT, E, OUTPUT, GIVEN]
 	
 	def find(similarTo: Id[INPUT], maxCount: Int): TopScores[INPUT, OUTPUT] = {
-		from.source.getRecommendations(similarTo, maxCount)
+		from.source.similarTo(similarTo, maxCount)
 	}
 	
 }
@@ -102,7 +106,7 @@ case class From[INPUT <: Node, E <: Edge, TObj <: Node, GIVEN <: Node]
 	extends FreqlFrom[INPUT, E, TObj, GIVEN](inputSource) {}
 
 case class FromItems[INPUT <: Node, E <: Edge, OUTPUT <: Node]
-(historySource: HistorySource[INPUT, E, OUTPUT])
+(historySource: HistoricProvider[INPUT, E, OUTPUT])
 	extends FreqlFrom[INPUT, E, OUTPUT, INPUT](
 		new HistoryUnitSource[INPUT, E, OUTPUT](historySource)) {}
 

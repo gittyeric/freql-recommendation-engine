@@ -13,14 +13,14 @@ class SourcesPivoter[INPUT <: Node, T <: Edge, T2 <: Edge, PivotOBJ <: Node, GIV
  maxSource2Targets: Int = Int.MaxValue)
 	extends TopScoreSource[INPUT, MergedEdge[T, T2], OUTPUT, MergedNode[GIVEN, GIVEN2]] {
 	
-	override def getRecommendations(originId: Id[INPUT], maxCount: Int): TopScores[INPUT, OUTPUT] = {
+	override def similarTo(originId: Id[INPUT], maxCount: Int): TopScores[INPUT, OUTPUT] = {
 		val targetToScores = new mutable.HashMap[Id[OUTPUT], Score[OUTPUT]]()
 		val targetToSeenCount = new mutable.HashMap[Id[OUTPUT], Int]()
 		
-		val scores = source1.getRecommendations(originId, maxCount)
+		val scores = source1.similarTo(originId, maxCount)
 		
 		scores.scores.foreach(ts => {
-			val scoresForTarget = source2.getRecommendations(ts.similarTargetId, maxSource2Targets)
+			val scoresForTarget = source2.similarTo(ts.similarTargetId, maxSource2Targets)
 			
 			scoresForTarget.scores.foreach(innerScore => {
 				val existingScore = targetToScores.get(innerScore.similarTargetId)

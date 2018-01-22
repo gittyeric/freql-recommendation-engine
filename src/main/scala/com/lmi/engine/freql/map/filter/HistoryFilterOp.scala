@@ -2,10 +2,10 @@ package com.lmi.engine.freql.map.filter
 
 import com.lmi.engine.freql.score.Score
 import com.lmi.engine.graph.{Edge, Id, Node}
-import com.lmi.engine.worker.history.HistorySource
+import com.lmi.engine.worker.history.HistoricProvider
 
 abstract class HistoryFilterOp[INPUT <: Node, OUTPUT <: Node]
-(historyService: HistorySource[INPUT, _ <: Edge, OUTPUT],
+(historyService: HistoricProvider[INPUT, _ <: Edge, OUTPUT],
  val trueCacheExpirationMs: Int,
  val falseCacheExpirationMs: Int)
 	extends CachedFilterOp {
@@ -18,14 +18,14 @@ abstract class HistoryFilterOp[INPUT <: Node, OUTPUT <: Node]
 	
 }
 
-case class InputRelatedBy[INPUT <: Node, OUTPUT <: Node]
-(historyService: HistorySource[INPUT, _ <: Edge, OUTPUT],
+case class InputRelatesTo[INPUT <: Node, OUTPUT <: Node]
+(historyService: HistoricProvider[INPUT, _ <: Edge, OUTPUT],
  trueExpirationMs: Int = 30000,
  falseExpirationMs: Int = 1000)
 	extends HistoryFilterOp[INPUT, OUTPUT](historyService, trueExpirationMs, falseExpirationMs) {
 	
 	override def shouldAllow(inputId: Id[INPUT], ts: Score[OUTPUT]): Boolean = {
-		historyService.exists(inputId, ts.similarTargetId)
+		historyService.items.exists(inputId, ts.similarTargetId)
 	}
 	
 }
@@ -33,8 +33,17 @@ case class InputRelatedBy[INPUT <: Node, OUTPUT <: Node]
 case class InputEqualsOutput()
 	extends FilterOp() {
 	
-	def keep[INPUT <: Node, O <: Node](inputId: Id[INPUT], ts: Score[O]): Boolean = {
+	override def keep[INPUT <: Node, O <: Node](inputId: Id[INPUT], ts: Score[O]): Boolean = {
 		inputId.id.equals(ts.similarTargetId.id)
+	}
+	
+}
+
+case class In[INPUT <: Node, O <: Node](matches: Id[O]*)
+	extends FilterOp() {
+	
+	override def keep[INPUT <: Node, O <: Node](inputId: Id[INPUT], ts: Score[O]): Boolean = {
+		!matches.contains(ts.similarTargetId)
 	}
 	
 }

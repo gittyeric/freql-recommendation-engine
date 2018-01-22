@@ -6,7 +6,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import com.lmi.engine.worker.output.trigger.protocols.TriggeredHttp.HttpQuery
+import com.lmi.engine.worker.output.trigger.protocols.HttpQuery
 import com.lmi.engine.worker.output.trigger.{TriggeredQuery, TriggeredRequest, TriggeredResponse, TriggeredResponseScore}
 import spray.json.DefaultJsonProtocol
 

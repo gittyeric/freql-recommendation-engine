@@ -10,6 +10,8 @@ FREQL is a realtime, highly scalable recommendation engine with a SQL-like query
 
 [Writing your Recommender App](#writing-your-app)
 
+[Query API](doc/queries.md)
+
 [Requirements](doc/requirements.md)
 
 [Building and Running](doc/build_and_run.md)
@@ -61,7 +63,7 @@ Now we could do a boring graph query to get all of User 1's watched videos:
 
     Select(Video,
 
-    FromItems(WatchedVideo.items)
+    FromItems(WatchedVideo)
 
     Where InputEquals( Id("1") ) )
 
@@ -92,6 +94,8 @@ Functional composition FTW!  Now you can call
 
 to suggest videos for User 1.
 
+[See Query API for more details](doc/queries.md)
+
 ### Step 3: Define your input EventStreams and OutputStreams
 
 Kafka makes for a great replay-able and scalable stream of input events,
@@ -100,11 +104,3 @@ An "Event" is simply an occurrence of some node Id with an edge pointing to some
 You can choose to trigger output either by explicit request, or by a reaction to
 recommendations changing in realtime.  For either purpose you'll want to use a
 TriggeredQuery or ReactiveQuery respectively, both of which have simple HTTP implementations.
-
-### TODO
-
-## Query API Docs
-
-### Graph Queries
-
-### Recommendation Queries

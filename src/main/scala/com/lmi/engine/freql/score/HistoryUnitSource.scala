@@ -2,17 +2,17 @@ package com.lmi.engine.freql.score
 
 import com.lmi.engine.freql.util.FreqlUtils
 import com.lmi.engine.graph.{Edge, Id, Node}
-import com.lmi.engine.worker.history.HistorySource
+import com.lmi.engine.worker.history.HistoricProvider
 
 import scala.collection.mutable.ListBuffer
 
 //Loads all of an origin's items with score 1 as if they were similarity scores
 class HistoryUnitSource[INPUT <: Node, T <: Edge, OUTPUT <: Node]
-(historySource: HistorySource[INPUT, T, OUTPUT])
+(historySource: HistoricProvider[INPUT, T, OUTPUT])
 	extends TopScoreSource[INPUT, T, OUTPUT, INPUT] {
 	
-	def getRecommendations(id: Id[INPUT], maxCount: Int): TopScores[INPUT, OUTPUT] = {
-		val items = historySource.getDestinationIdsFor(id, maxCount)
+	def similarTo(id: Id[INPUT], maxCount: Int): TopScores[INPUT, OUTPUT] = {
+		val items = historySource.items.getDestinationIdsFor(id, maxCount)
 		val scores = new ListBuffer[Score[OUTPUT]]()
 		
 		while (items.hasNext) {

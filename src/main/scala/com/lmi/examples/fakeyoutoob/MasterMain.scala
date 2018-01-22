@@ -4,18 +4,19 @@ import com.lmi.engine.worker.input.EventStream
 import com.lmi.engine.worker.util.ignite.IgniteConfig
 import com.lmi.engine.{BasicProductionTuning, Engine}
 
-object Main {
+object MasterMain {
 	
 	//JVM Entrypoint
 	def main(args: Array[String]): Unit = {
-		//Replace with YOUR App instance
-		val inputStreams = Seq[EventStream]()
-		val app = new FakeYouToobApp(inputStreams)
-		
-		Engine.start(
-			app,
+		Engine.startMaster(
+			createApp(),
 			BasicProductionTuning(),
 			() => IgniteConfig.getOrCreateIgnite())
+	}
+	
+	def createApp(): FakeYouToobApp = {
+		val inputStreams = Seq[EventStream]()
+		new FakeYouToobApp(inputStreams)
 	}
 	
 }
