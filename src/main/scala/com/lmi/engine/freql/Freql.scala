@@ -93,6 +93,11 @@ case class Select[INPUT <: Node, E <: Edge, OUTPUT <: Node, GIVEN <: Node]
 (outputObj: OUTPUT, from: FreqlFrom[INPUT, E, OUTPUT, GIVEN])
 	extends FreqlSelect[INPUT, E, OUTPUT, GIVEN] {}
 
+//To do: make suggest incompatible with FromItems, then get rid of FromItems
+case class Suggest[INPUT <: Node, E <: Edge, OUTPUT <: Node, GIVEN <: Node]
+(outputObj: OUTPUT, from: FreqlFrom[INPUT, E, OUTPUT, GIVEN])
+	extends FreqlSelect[INPUT, E, OUTPUT, GIVEN] {}
+
 object From {
 	
 	//Ugliness that allows the From case class to have 2 different constructors

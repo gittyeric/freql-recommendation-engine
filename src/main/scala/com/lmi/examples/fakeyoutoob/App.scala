@@ -2,7 +2,7 @@ package com.lmi.examples.fakeyoutoob
 
 import com.lmi.engine._
 import com.lmi.engine.freql.map.filter.{InputEqualsOutput, InputRelatesTo, Not}
-import com.lmi.engine.freql.{From, Select}
+import com.lmi.engine.freql.{From, Suggest}
 import com.lmi.engine.graph._
 import com.lmi.engine.worker.RelationService
 import com.lmi.engine.worker.event.EventRouter
@@ -28,19 +28,19 @@ class FakeYouToobApp(inputs: Seq[EventStream] = Seq()) extends FreqlApp {
 	
 	// Get all users who are similar to me based on any user-centric data
 	val relatedUsers =
-		Select(User,
+		Suggest(User,
 			From(located) Join subscribed Join watched
 				Where NotMe)
 	
 	// Recommend autoplay published based on everything
 	val autoplaySuggestions =
-		Select(Video,
+		Suggest(Video,
 			From(relatedUsers) To watched
 				Where NotWatched)
 	
 	// Get the publishers that people similar to me subscribe to, for whom I haven't subscribed.
 	val recommendedPublishers =
-		Select(User,
+		Suggest(User,
 			From(relatedUsers) To subscribed
 				Where NotMeAndNotSubscribedTo
 		)

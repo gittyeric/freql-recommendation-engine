@@ -2,7 +2,7 @@ package com.lmi.examples.whitepaper
 
 import com.lmi.engine._
 import com.lmi.engine.freql.map.filter.{InputEqualsOutput, InputRelatesTo, Not}
-import com.lmi.engine.freql.{From, Select}
+import com.lmi.engine.freql.{From, Suggest}
 import com.lmi.engine.graph.{Edge, Node}
 import com.lmi.engine.worker.RelationService
 import com.lmi.engine.worker.event.EventRouter
@@ -28,71 +28,71 @@ class WhitepaperApp(inputs: Seq[EventStream]) extends FreqlApp {
 	
 	//Recommend papers based on authors
 	val papersByAuthors =
-		Select(Paper,
+		Suggest(Paper,
 			From(authored)
 				Where NotInputPaper)
 	
 	//Recommend papers based on what they reference
 	val papersByReference =
-		Select(Paper,
+		Suggest(Paper,
 			From(referenced)
 				Where NotInputPaper)
 	
 	//Recommend papers based on tags
 	val papersByTag =
-		Select(Paper,
+		Suggest(Paper,
 			From(tagged)
 				Where NotInputPaper)
 	
 	//Recommend papers based on categories
 	val papersByCat =
-		Select(Paper,
+		Suggest(Paper,
 			From(categorized)
 				Where NotInputPaper)
 	
 	//Recommend papers based on their publisher's group
 	val papersByGroup =
-		Select(Paper,
+		Suggest(Paper,
 			From(grouped)
 				Where NotInputPaper)
 	
 	//Recommend papers based on any and all available info
 	val papersByAll =
-		Select(Paper,
+		Suggest(Paper,
 			From(papersByAuthors) Join papersByReference Join papersByCat Join papersByTag Join papersByGroup)
 	
 	//Recommend file attachments based on a paper
 	val InputPaperDoesNotHaveFile = Not(InputRelatesTo(attached))
 	val filesByAll =
-		Select(File,
+		Suggest(File,
 			From(papersByAll) To attached
 				Where InputPaperDoesNotHaveFile)
 	
 	//Recommend categories based on a paper
 	val InputPaperDoesNotHaveCat = Not(InputRelatesTo(categorized))
 	val catsByAll =
-		Select(Category,
+		Suggest(Category,
 			From(papersByAll) To categorized
 				Where InputPaperDoesNotHaveCat)
 	
 	//Recommend categories based on a paper
 	val InputPaperDoesNotHaveTag = Not(InputRelatesTo(tagged))
 	val tagsByAll =
-		Select(Tag,
+		Suggest(Tag,
 			From(papersByAll) To tagged
 				Where InputPaperDoesNotHaveTag)
 	
 	//Recommend groups similar to a paper
 	val InputPaperDoesNotHaveGroup = Not(InputRelatesTo(grouped))
 	val groupsByAll =
-		Select(Group,
+		Suggest(Group,
 			From(papersByAll) To grouped
 				Where InputPaperDoesNotHaveGroup)
 	
 	//Recommend authors similar to a paper
 	val InputPaperDoesNotHaveAuthor = Not(InputRelatesTo(authored))
 	val authorsByAll =
-		Select(Author,
+		Suggest(Author,
 			From(papersByAll) To authored
 				Where InputPaperDoesNotHaveAuthor)
 	

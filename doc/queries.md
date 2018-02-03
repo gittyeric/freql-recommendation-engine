@@ -2,17 +2,19 @@
 
 All queries receive as input a single Id.  From queries will returns recommendations while FromItems is a simple graph search to get the input Id's Related Nodes.
 
-### Select
+**Select & FromItems** gets the destination nodes of all Relations that match the input Id.  For example, get all of a user's videos:
 
-Any query starts with specifying the output type using **Select**.  This ensures that the inner From matches up to what you're trying to get:
+    Select(Video, FromItems( UserWatchedVideo ) )
 
-    Select( [Node Type in output], ...)
+### Suggest & From
 
-### From
-
+Any query starts with specifying the output type using **Suggest**.  This ensures that the inner From matches up to what you're trying to get:
 The **From** clause specifies the Relation to get from. For example, getting similar Users based on watched videos:
 
-    Select(User, From( UserWatchedVideo ) )
+    Suggest(User, From( UserWatchedVideo ) )
+    ### FromItems
+
+
 
 ### To
 
@@ -20,11 +22,6 @@ The **From** clause specifies the Relation to get from. For example, getting sim
 
     Select(Video, From WatchedVideos To WatchedVideos)
 
-### FromItems
-
-**FromItems** gets the destination nodes of all Relations that match the input Id.  For example, get all of a user's videos:
-
-    Select(Video, FromItems( UserWatchedVideo ) )
 
 ### Where
 
