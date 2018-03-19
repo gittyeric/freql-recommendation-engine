@@ -15,7 +15,7 @@ object WhitepaperApp {
 	
 	def createApp() = {
 		val tsvParser = new DelimiterParser('\t')
-		val inputStreams = Seq[EventStream](new KafkaEventStream("event", tsvParser.parseEvent, "brokenpoker.com:2181"))
+		val inputStreams = Seq[EventStream](new KafkaEventStream("event", tsvParser.parseEvent, "192.241.230.141:2181"))
 		new WhitepaperApp(inputStreams)
 	}
 	
