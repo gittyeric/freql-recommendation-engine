@@ -23,6 +23,8 @@ class KafkaEventStream(val topic: String,
 	
 	private val logger = Logger.getLogger("KafkaEventStream")
 	
+	private var dbCount = 0
+	
 	override def startStreaming(ignite: Ignite, cacheName: String): Unit = {
 		val kafkaStreamer = new KafkaStreamer[String, ParsedEvent]()
 		
@@ -33,7 +35,14 @@ class KafkaEventStream(val topic: String,
 				val key = QueuedEventIgniteUtil.createNextKey(ignite)
 				
 				if(value.isFailure) {
-					//logger.error("Could not parse line: " + line)
+					logger.error("Could not parse line: " + line + "\n" +
+						value.failed.get.getMessage)
+				}
+				else {
+					dbCount += 1
+					if(dbCount % 10000 == 0) {
+						logger.error("Locally indexed " + dbCount + " events")
+					}
 				}
 				
 				new SimpleEntry(key, value.getOrElse(null))

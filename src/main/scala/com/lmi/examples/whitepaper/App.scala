@@ -7,8 +7,19 @@ import com.lmi.engine.graph.{Edge, Node}
 import com.lmi.engine.worker.RelationService
 import com.lmi.engine.worker.event.EventRouter
 import com.lmi.engine.worker.input.EventStream
+import com.lmi.engine.worker.input.kafka.KafkaEventStream
 import com.lmi.engine.worker.output.trigger.protocols.HttpQuery
-import com.lmi.engine.worker.parse.EventRoute
+import com.lmi.engine.worker.parse.{DelimiterParser, EventRoute}
+
+object WhitepaperApp {
+	
+	def createApp() = {
+		val tsvParser = new DelimiterParser('\t')
+		val inputStreams = Seq[EventStream](new KafkaEventStream("event", tsvParser.parseEvent, "brokenpoker.com:2181"))
+		new WhitepaperApp(inputStreams)
+	}
+	
+}
 
 //An example of using Figshare API data to recommend whitepapers, authors, etc.
 class WhitepaperApp(inputs: Seq[EventStream]) extends FreqlApp {

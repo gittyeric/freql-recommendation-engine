@@ -10,7 +10,7 @@ import org.apache.ignite.{Ignite, Ignition}
 
 object IgniteConfig extends Serializable {
 	
-	val IGNITE_NODE_IP = "127.0.0.1"
+	val LOCALHOST = "127.0.0.1"
 	val FREQL_IGNITE_EVENT_TYPES =
 		Array(
 			EventType.EVT_CACHE_ENTRY_CREATED,
@@ -19,9 +19,9 @@ object IgniteConfig extends Serializable {
 			EventType.EVT_CACHE_OBJECT_PUT)
 	
 	def getOrCreateIgnite(
-		                     igniteNodeIp: String = IGNITE_NODE_IP,
+		                     igniteNodeIp: String = LOCALHOST,
 		                     cnf: IgniteConfiguration =
-		                     IgniteConfig.createIgniteConfig(IgniteConfig.getClusterConnectionConfig(IGNITE_NODE_IP))): Ignite = {
+		                     IgniteConfig.createIgniteConfig(IgniteConfig.getClusterConnectionConfig(LOCALHOST))): Ignite = {
 		Ignition.getOrStart(cnf)
 	}
 	

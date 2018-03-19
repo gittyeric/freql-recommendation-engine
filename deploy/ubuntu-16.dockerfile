@@ -1,7 +1,7 @@
-FROM wtanaka/ubuntu-1604-oracle-java-9
+FROM wtanaka/ubuntu-1604-oracle-java-8-git
 MAINTAINER  Eric <git@letsmakeit.com>
 
-### Input variables you can set here or overwrite when building with --build-art
+### Input variables you can set here or overwrite when building with --build-arg
 
 ARG REPO_URL="https://github.com/gittyeric/freql-recommendation-engine.git"
 ARG FREQL_JVM_RAM="256M"
@@ -13,6 +13,11 @@ ARG MAIN_CLASS
 
 RUN echo "export JAVA_HOME=/usr/lib/jvm/java-9-oracle" >> ~/.bashrc
 RUN echo "export JAVA_OPTS=\"-Xmx${FREQL_JVM_RAM} -Xms${FREQL_JVM_RAM} -XX:+UseG1GC\"" >> ~/.bashrc
+
+RUN echo "\n\nInstalling FREQL with the following arguments:"
+RUN echo "RAM: ${FREQL_JVM_RAM}"
+RUN echo "Main class: ${MAIN_CLASS}"
+RUN echo "Git Repo: ${REPO_URL}\n\n"
 
 ### Install Maven and Git
 

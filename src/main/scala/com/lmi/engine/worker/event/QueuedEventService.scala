@@ -12,7 +12,7 @@ object QueuedEventIgniteUtil {
 	
 	val curId = new AtomicLong(0)
 	private val QUEUE_CACHE_NAME = "QueuedEvents"
-	private val logger = Logger.getLogger("KafkaEventStream")
+	private val logger = Logger.getLogger("QueuedEventService")
 	
 	def createNextKey(ignite: Ignite): String = {
 		if(curId.get() % 5000 == 0) {

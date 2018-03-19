@@ -7,6 +7,7 @@ import com.lmi.engine.worker.history.{HistoryEntry, HistoryUtil}
 import com.lmi.engine.worker.parse.ParsedEvent
 import com.lmi.engine.{EngineContext, EngineThreads}
 import org.apache.ignite.IgniteCache
+import org.apache.log4j.Logger
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -14,6 +15,7 @@ import scala.collection.mutable.ListBuffer
 class EventDequeuer(router: EventRouter)
                    (implicit context: EngineContext) {
 	
+	private val logger = Logger.getLogger("QueuedEventService")
 	val tuning = context.tuning
 	var isRunning = new AtomicBoolean(false)
 	

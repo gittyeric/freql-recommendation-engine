@@ -14,6 +14,12 @@ class DelimiterParser(delimiter: Char) {
 		if(split.length < 3) {
 			Failure(new IllegalArgumentException("Could not parse both fields from event"))
 		}
+		else if(split(1).trim.isEmpty) {
+			Failure(new IllegalArgumentException("First field was empty"))
+		}
+		else if(split(2).trim.isEmpty) {
+			Failure(new IllegalArgumentException("Second field was empty"))
+		}
 		else {
 			val eventType: String = split(0)
 			try {
