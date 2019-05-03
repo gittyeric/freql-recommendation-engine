@@ -1,19 +1,24 @@
 ## Query API Docs
 
-All queries receive as input a single Id.  From queries will returns recommendations while FromItems is a simple graph search to get the input Id's Related Nodes.
+All queries receive as input a single Id.  **"From"** represents a recommendation rank query while **"FromItems"** is a simple graph search to get the input Id's "Related" "Nodes", aka "Traversing" the input Id's Relation edges and returning a list of the "Destination" nodes.
 
-**Select & FromItems** gets the destination nodes of all Relations that match the input Id.  For example, get all of a user's videos:
+### Select & FromItems
+
+A **Select** query is essentially a useless SQL-and-readability-friendly front for the inner **FromItems** it uses:
+
+**FromItems** gets the destination nodes of all Relations that match the input Id.  For example, get all of a user's videos:
 
     Select(Video, FromItems( UserWatchedVideo ) )
+    
+**FromItems** may appear without a matching **Select** when nested inside a complex **Suggest** query.
 
 ### Suggest & From
 
-Any query starts with specifying the output type using **Suggest**.  This ensures that the inner From matches up to what you're trying to get:
-The **From** clause specifies the Relation to get from. For example, getting similar Users based on watched videos:
+Any suggestion rank-based query starts with specifying the output type using **Suggest**.
+
+The **From** clause specifies the Relation to base suggestions from. For example, getting similar Users based on watched videos:
 
     Suggest(User, From( UserWatchedVideo ) )
-    ### FromItems
-
 
 
 ### To
